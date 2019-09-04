@@ -65,19 +65,6 @@ fn main() {
                     last_command = String::new();
                     
                 },
-                termion::event::Key::Char(n) => {
-                    write!(
-                        stdout,
-                        "{}",
-                        n
-                    )
-                    .unwrap();
-
-                    stdout.lock().flush().unwrap();
-
-                    last_command.push(n);
-
-                },
                 termion::event::Key::Left => {
                     write!(
                         stdout,
@@ -111,10 +98,24 @@ fn main() {
                     stdout.lock().flush().unwrap();
 
                 },
+                termion::event::Key::Char(n) => {
+                    write!(
+                        stdout,
+                        "{}",
+                        n
+                    )
+                    .unwrap();
+
+                    stdout.lock().flush().unwrap();
+
+                    last_command.push(n);
+
+                },
+
                 _ => ()
             }
         }
-//        thread::sleep(time::Duration::from_millis(50));
+        thread::sleep(time::Duration::from_millis(50));
     }
 }
 
