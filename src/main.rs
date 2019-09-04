@@ -48,21 +48,16 @@ fn main() {
                         '\n',
                     ).unwrap();
 
-                    let (
-                        output,
-                        end_shell
-                    ) = execute_str(&last_command);
+                    let end_shell = execute_str(&last_command);
 
                     if !end_shell {
                         break; 
                     }
 
-                    let formatted_output = format_output(output);
-
                     write!(
                         stdout,
                         "{}{}",
-                        formatted_output,
+                        '\r',
                         prompt
                     ).unwrap();
 
@@ -119,11 +114,11 @@ fn main() {
                 _ => ()
             }
         }
-        thread::sleep(time::Duration::from_millis(50));
+//        thread::sleep(time::Duration::from_millis(50));
     }
 }
 
-fn execute_str(input: &str) -> (String, bool) {
+fn execute_str(input: &str) -> bool {
    
     let mut parts = input.trim().split_whitespace();
     let command_option = parts.next();
@@ -131,35 +126,29 @@ fn execute_str(input: &str) -> (String, bool) {
     let args = parts;
 
     match command {
-        "" => (String::new(), true),
+        "" => true,
         "cd" => {
             let new_dir = args.peekable()
                 .peek()
                 .map_or(CD_DEFAULT, |x| *x);
             let root = Path::new(new_dir);
             env::set_current_dir(&root);
-            (String::new(), true)
+            true
         },
-        "exit" => (String::new(), false),
+        "exit" => false,
         command => {
             let child = Command::new(command)
                 .args(args)
-                .stdout(Stdio::piped())
                 .spawn();
 
             let output = match child {
                 Ok(mut child) => { 
-                    let output = child.wait_with_output().unwrap(); 
-                    String::from_utf8(output.stdout).unwrap()
+                    let _ = child.wait().unwrap(); 
                 },
-                Err(e) => format!("{}", e)
+                Err(e) => eprintln!("{}", e)
             };
-            (output, true)
+            true
         }
     }
-}
-
-fn format_output(output: String) -> String{
-    output.replace("\n", "\n\r")
 }
 
