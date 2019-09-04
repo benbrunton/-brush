@@ -33,9 +33,9 @@ fn main() {
                     write!(
                         stdout,
                         "{}{}{}",
-                        prompt,
                         termion::clear::All,
-                        termion::cursor::Goto(1, 1)
+                        termion::cursor::Goto(1, 1),
+                        prompt,
                     ).unwrap();
                     stdout.lock().flush().unwrap();
 
@@ -111,6 +111,7 @@ fn main() {
                         termion::clear::AfterCursor,
                     )
                     .unwrap();
+                    last_command.pop();
 
                     stdout.lock().flush().unwrap();
 
